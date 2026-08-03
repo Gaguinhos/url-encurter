@@ -1,0 +1,20 @@
+name: Enforce Dev to Main
+
+on:
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  enforce-branch:
+    runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
+    steps:
+      - name: Check branch origin
+        run: |
+          if [ "${{ github.head_ref }}" != "dev" ]; then
+            echo "Error: Pull Requests to main can only be opened from the dev branch."
+            exit 1
+          fi
+          echo "Success: The PR is coming from dev."
