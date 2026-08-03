@@ -1,0 +1,28 @@
+name: Enforce Dev to Main
+
+on:
+  pull_request:
+    # Mesmo com o filtro abaixo, é bom ter a dupla checagem no script
+    branches:
+      - main 
+
+jobs:
+  enforce-branch:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Verificar branches de origem e destino
+        run: |
+          # 1. Verifica se o PR tem como destino (base) a main. 
+          # Se não for para a main, ele libera o PR automaticamente (exit 0).
+          if [ "${{ github.base_ref }}" != "main" ]; then
+            echo "O PR é para a branch '${{ github.base_ref }}'. Bloqueio ignorado, liberando PR..."
+            exit 0
+          fi
+
+          # 2. Se o destino for a main, verifica se a origem (head) é a dev.
+          if [ "${{ github.head_ref }}" != "dev" ]; then
+            echo "Erro: Pull Requests para a main só podem ser abertos a partir da branch dev."
+            exit 1
+          fi
+          
+          echo "Sucesso: O PR está vindo da dev para a main."
